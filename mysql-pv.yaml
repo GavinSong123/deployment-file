@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    namespaceName: cc-dev
+    storageName: console-mysql-pvc
+  name: cc-dev-console-mysql-pvc-pv
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: "10737418240"
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: console-mysql-pvc
+    namespace: cc-dev
+  persistentVolumeReclaimPolicy: Retain
+  rbd:
+    fsType: ext4
+    image: console-mysql-pvc
+    keyring: /etc/ceph/keyring
+    monitors:
+    - 10.19.137.144:6789
+    - 10.19.137.145:6789
+    - 10.19.137.146:6789
+    pool: k8s.cc-dev
+    readOnly: true
+    secretRef:
+      name: cc-dev
+    user: cc-dev
+

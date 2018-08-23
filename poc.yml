@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: poc
+  namespace: druid-pe
+  labels:
+    app: poc
+spec:
+  type: NodePort
+  ports:
+    # the port that this service should serve on
+  - port: 4209
+    targetPort: 4209
+  selector:
+    app: poc
+    name: poc
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: poc
+  namespace: druid-pe
+  labels:
+    app: poc
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: poc
+        name: poc
+    spec:
+      containers:
+      - name: poc
+        image: 10.19.248.200:30100/laikang/poc_ui:v0.1
+        imagePullPolicy: Always
+        # 后端API地址
+        env:
+        - name: "BACKEND_URL"
+          value: "http://10.19.248.20:29794/laikang/v1"
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+          requests:
+            cpu: "0.3"
+            memory: "1Gi"
+        ports:
+        - containerPort: 4209

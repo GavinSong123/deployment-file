@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cc-metric
+  namespace: cc-stage
+  labels:
+    app: cc
+spec:
+  type: NodePort
+  ports:
+    # the port that this service should serve on
+  - port: 8813
+    targetPort: 8813
+    nodePort: 32413
+  selector:
+    app: cc
+    name: cc-metric
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cc-metric
+  namespace: cc-dev
+  labels:
+    app: cc
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cc
+        name: cc-metric
+    spec:
+      containers:
+      - name: cc-metric
+        image: 127.0.0.1:30100/console/cc-metric:2017-09.r3
+        imagePullPolicy: Always
+        env:
+        - name: "OPENTSDB_URL"
+          value: "http://10.19.248.200:30142/api"
+          # monitoring-opentsdb-ex.monitor-essential-service:4242/api
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+          requests:
+            cpu: "0.3"
+            memory: "1Gi"
+        ports:
+        - containerPort: 8813
